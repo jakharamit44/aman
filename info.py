@@ -34,7 +34,7 @@ LOG_CHANNEL = int(environ.get('LOG_CHANNEL', '-1001979302999'))
 # MongoDB information
 DATABASE_URL = environ.get('DATABASE_URL', "mongodb+srv://amit:amit@cluster0.gqibfmc.mongodb.net/?retryWrites=true&w=majority")
 DATABASE_NAME = environ.get('DATABASE_NAME', "Cluster0")
-COLLECTION_NAME = environ.get('COLLECTION_NAME', 'Files')
+COLLECTION_NAME = environ.get('COLLECTION_NAME', 'TELFiles')
 
 # Links
 SUPPORT_LINK = environ.get('SUPPORT_LINK', 'https://t.me/Mkv_hd_Cinema')
