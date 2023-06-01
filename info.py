@@ -22,7 +22,7 @@ PICS = (environ.get('PICS', 'https://telegra.ph/file/58fef5cb458d5b29b0186.jpg h
 
 # Bot Admins
 ADMINS = [int(admins) if id_pattern.search(admins) else admins for admins in environ.get('ADMINS', '1237362390').split()]
-auth_users = [int(auth_users) if id_pattern.search(auth_users) else auth_users for auth_users in environ.get('AUTH_USERS', '').split()]
+auth_users = [int(auth_users) if id_pattern.search(auth_users) else auth_users for auth_users in environ.get('AUTH_USERS', '1864861524').split()]
 AUTH_USERS = (auth_users + ADMINS) if auth_users else []
 
 # Channels
