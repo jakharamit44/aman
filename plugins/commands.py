@@ -567,25 +567,70 @@ async def save_welcome(client, message):
     await message.reply_text(f"Successfully changed welcome for {title} to\n\n{welcome}")
     
     
+# @Client.on_message(filters.command('delete') & filters.user(ADMINS))
+# async def delete(bot, message):
+#     msg = await message.reply_text('Fetching...')
+#     srt = await Media.count_documents({'mime_type': 'application/x-subrip'})
+#     avi = await Media.count_documents({'mime_type': 'video/x-msvideo'})
+#     zip = await Media.count_documents({'mime_type': 'application/zip'})
+#     rar = await Media.count_documents({'mime_type': 'application/x-rar-compressed'})
+#     btn = [[
+#         InlineKeyboardButton(f"SRT ({srt})", callback_data="srt_delete"),
+#         InlineKeyboardButton(f"AVI ({avi})", callback_data="avi_delete"),
+#     ],[
+#         InlineKeyboardButton(f"ZIP ({zip})", callback_data="zip_delete"),
+#         InlineKeyboardButton(f"RAR ({rar})", callback_data="rar_delete")
+#     ],[
+#         InlineKeyboardButton("CLOSE", callback_data="close_data")
+#     ]]
+#     await msg.edit('Choose do you want to delete file type?', reply_markup=InlineKeyboardMarkup(btn))
+    
 @Client.on_message(filters.command('delete') & filters.user(ADMINS))
 async def delete(bot, message):
-    msg = await message.reply_text('Fetching...')
-    srt = await Media.count_documents({'mime_type': 'application/x-subrip'})
-    avi = await Media.count_documents({'mime_type': 'video/x-msvideo'})
-    zip = await Media.count_documents({'mime_type': 'application/zip'})
-    rar = await Media.count_documents({'mime_type': 'application/x-rar-compressed'})
-    btn = [[
-        InlineKeyboardButton(f"SRT ({srt})", callback_data="srt_delete"),
-        InlineKeyboardButton(f"AVI ({avi})", callback_data="avi_delete"),
-    ],[
-        InlineKeyboardButton(f"ZIP ({zip})", callback_data="zip_delete"),
-        InlineKeyboardButton(f"RAR ({rar})", callback_data="rar_delete")
-    ],[
-        InlineKeyboardButton("CLOSE", callback_data="close_data")
-    ]]
-    await msg.edit('Choose do you want to delete file type?', reply_markup=InlineKeyboardMarkup(btn))
+    """Delete file from database"""
+    reply = message.reply_to_message
+    if reply and reply.media:
+        msg = await message.reply("𝐃𝐞𝐥𝐞𝐭𝐢𝐧𝐠....🗑️", quote=True)
+    else:
+        await message.reply('Reply to file with /delete which you want to delete', quote=True)
+        return
+
+    for file_type in ("document", "video", "audio"):
+        media = getattr(reply, file_type, None)
+        if media is not None:
+            break
+    else:
+        await msg.edit('This is not supported file format')
+        return
     
-    
+    file_id, file_ref = unpack_new_file_id(media.file_id)
+
+    result = await Media.collection.delete_one({
+        '_id': file_id,
+    })
+    if result.deleted_count:
+        await msg.edit('**𝙵𝙸𝙻𝙴 𝚂𝚄𝙲𝙲𝙴𝚂𝚂𝙵𝚄𝙻𝙻𝚈 𝙳𝙴𝙻𝙴𝚃𝙴𝙳**')
+    else:
+        file_name = re.sub(r"(_|\-|\.|\+)", " ", str(media.file_name))
+        result = await Media.collection.delete_many({
+            'file_name': file_name,
+            'file_size': media.file_size,
+            'mime_type': media.mime_type
+            })
+        if result.deleted_count:
+            await msg.edit('**𝙵𝙸𝙻𝙴 𝚂𝚄𝙲𝙲𝙴𝚂𝚂𝙵𝚄𝙻𝙻𝚈 𝙳𝙴𝙻𝙴𝚃𝙴𝙳**')
+        else:
+            # files indexed before https://github.com/EvamariaTG/EvaMaria/commit/f3d2a1bcb155faf44178e5d7a685a1b533e714bf#diff-86b613edf1748372103e94cacff3b578b36b698ef9c16817bb98fe9ef22fb669R39 
+            # have original file name.
+            result = await Media.collection.delete_many({
+                'file_name': media.file_name,
+                'file_size': media.file_size,
+                'mime_type': media.mime_type
+            })
+            if result.deleted_count:
+                await msg.edit('**𝙵𝙸𝙻𝙴 𝚂𝚄𝙲𝙲𝙴𝚂𝚂𝙵𝚄𝙻𝙻𝚈 𝙳𝙴𝙻𝙴𝚃𝙴𝙳**')
+            else:
+                await msg.edit('File not found in database')    
 
 @Client.on_message(filters.command('delete_all') & filters.user(ADMINS))
 async def delete_all_index(bot, message):
