@@ -110,7 +110,7 @@ async def next_page(bot, query):
             for file in files
         ]
         btn.insert(0,
-            [InlineKeyboardButton("🎈 Send All 🎈", url=await get_shortlink(query.message.chat.id, f'https://t.me/{temp.U_NAME}?start=all_{query.message.chat.id}_{pre}_{key}'))]
+            [InlineKeyboardButton(text="⚡ʜᴏᴡ ᴛᴏ ᴅᴏᴡɴʟᴏᴀᴅ⚡", url='https://youtu.be/cN0O0_OiDyk')]
         )
     else:
         btn = [
@@ -736,7 +736,7 @@ async def auto_filter(client, msg, spoll=False):
             for file in files
         ]
         btn.insert(0,
-            [InlineKeyboardButton("🎈 Send All 🎈", url=await get_shortlink(message.chat.id, f'https://t.me/{temp.U_NAME}?start=all_{message.chat.id}_{pre}_{key}'))]
+            [InlineKeyboardButton(text="⚡ʜᴏᴡ ᴛᴏ ᴅᴏᴡɴʟᴏᴀᴅ⚡", url='https://youtu.be/cN0O0_OiDyk')]
         )
     else:
         btn = [
